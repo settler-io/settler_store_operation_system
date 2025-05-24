@@ -1,0 +1,31 @@
+{
+  "extends": "@tsconfig/strictest/tsconfig.json",
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/application/*": ["./src/lib/application/*"],
+      "@/domain/*": ["./src/lib/domain/*"],
+      "@/infra/*": ["./src/lib/infra/*"],
+      "@/ui/*": ["./src/lib/ui/*"],
+      "@/hooks/*": ["./src/lib/hooks/*"]
+    }
+  }
+}

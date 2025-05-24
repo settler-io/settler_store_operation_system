@@ -1,0 +1,5 @@
+/* サムネイルの数が多いとコンテナ幅を超過してしまうため */
+.image-gallery-thumbnails {
+  max-width: 480px;
+  overflow: hidden;
+}

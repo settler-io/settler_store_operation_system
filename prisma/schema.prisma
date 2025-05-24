@@ -1,0 +1,229 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ユーザ
+model User {
+  id           String   @map("id") @db.Char(16)
+  version      Int      @default(0) @map("version")
+  email        String?  @map("email")
+  password     String?  @map("password") @db.Char(64) // sha256のハッシュ値なので64文字
+  imageUrl     String?  @map("image_url")
+  nickname     String?  @map("nickname") @db.VarChar(16)
+  pointBalance Int      @default(0) @map("point_balance") @db.UnsignedInt
+  status       String   @map("status")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  emailVerificationTokens EmailVerificationToken[]
+  pointHistory            PointHistory[]
+
+  userSetting         UserSetting?
+  userGame            UserGame[]
+  hostImage           HostImage[]
+  hostReservation     Reservation[] @relation("hostUser")
+  guestReservation    Reservation[] @relation("guestUser")
+  viewHistory         ViewHistory[] @relation("viewUser")
+  viewedHistory       ViewHistory[] @relation("viewedUser")
+  attraction          Attraction[]
+  evaluateEvaluation  Evaluation[]  @relation("evaluateUser")
+  evaluatedEvaluation Evaluation[]  @relation("evaluatedUser")
+  sendChat            Chat[]        @relation("sendUser")
+  receiveChat         Chat[]        @relation("receiveUser")
+
+  @@id(id)
+  @@unique(email)
+  @@map("users")
+}
+
+// メール認証トークン
+model EmailVerificationToken {
+  id        String   @default(uuid()) @map("id")
+  version   Int      @default(0) @map("version")
+  userId    String   @map("user_id") @db.Char(16)
+  email     String   @map("email")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id(id)
+  @@map("email_verification_tokens")
+}
+
+// ポイント履歴
+model PointHistory {
+  id              String   @map("id") @db.Char(16)
+  version         Int      @default(0) @map("version")
+  userId          String   @map("user_id") @db.Char(16)
+  title           String   @map("title")
+  cause           String   @map("cause")
+  purchasedAmount Int?     @map("purchased_amount")
+  changes         Int      @map("changes")
+  balance         Int      @map("balance") @db.UnsignedInt
+  executedAt      DateTime @default(now()) @map("executed_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id(id)
+  @@index([userId, executedAt])
+  @@map("point_history")
+}
+
+//Gemucha用ユーザー設定
+model UserSetting {
+  id        String    @map("id") @db.Char(16)
+  version   Int       @default(0) @map("version")
+  userId    String    @map("user_id") @db.Char(16)
+  price     Int       @map("price") @db.UnsignedInt
+  withFace  Boolean   @map("with_face")
+  imageUrl  String?   @map("image_url")
+  profile   String?   @map("profile") @db.VarChar(500)
+  discordId String?   @map("discord_id") @db.VarChar(50)
+  isHost    Boolean   @default(false) @map("is_host")
+  hostAt    DateTime? @map("host_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id(id)
+  @@unique([userId])
+  @@index([isHost, hostAt])
+  @@map("user_setting")
+}
+
+model UserGame {
+  id        String   @map("id") @db.Char(16)
+  version   Int      @default(0) @map("version")
+  userId    String   @map("user_id") @db.Char(16)
+  name      String   @map("name")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id(id)
+  @@map("user_game")
+}
+
+model HostImage {
+  id        String   @map("id") @db.Char(16)
+  version   Int      @default(0) @map("version")
+  userId    String   @map("user_id") @db.Char(16)
+  imageUrl  String   @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id(id)
+  @@map("host_image")
+}
+
+model Reservation {
+  id          String   @map("id") @db.Char(16)
+  version     Int      @default(0) @map("version")
+  hostUserId  String   @map("host_user_id") @db.Char(16)
+  guestUserId String   @map("guest_user_id") @db.Char(16)
+  startAt     DateTime @map("start_at")
+  endAt       DateTime @map("end_at")
+  price       Int      @map("price") @db.UnsignedInt
+  game        String   @map("game")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  hostUser   User         @relation("hostUser", fields: [hostUserId], references: [id])
+  guestUser  User         @relation("guestUser", fields: [guestUserId], references: [id])
+  evaluation Evaluation[]
+
+  @@id(id)
+  @@index([hostUserId, startAt])
+  @@index([guestUserId, startAt])
+  @@map("reservation")
+}
+
+model ViewHistory {
+  id           String   @map("id") @db.Char(16)
+  version      Int      @default(0) @map("version")
+  viewUserId   String   @map("view_user_id") @db.Char(16)
+  viewedUserId String   @map("viewed_user_id") @db.Char(16)
+  viewAt       DateTime @map("view_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  viewUser   User @relation("viewUser", fields: [viewUserId], references: [id])
+  viewedUser User @relation("viewedUser", fields: [viewedUserId], references: [id])
+
+  @@id(id)
+  @@index([viewUserId, viewAt])
+  @@index([viewedUserId, viewAt])
+  @@map("view_history")
+}
+
+model Attraction {
+  id        String   @map("id") @db.Char(16)
+  version   Int      @default(0) @map("version")
+  userId    String   @map("user_id") @db.Char(16)
+  message   String   @map("message") @db.VarChar(140)
+  startAt   DateTime @map("start_at")
+  endAt     DateTime @map("end_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id(id)
+  @@index([userId, startAt])
+  @@index([startAt])
+  @@map("attraction")
+}
+
+model Evaluation {
+  id              String   @map("id") @db.Char(16)
+  version         Int      @default(0) @map("version")
+  reservationId   String   @map("reservation_id") @db.Char(16)
+  side            String   @map("side") @db.VarChar(10)
+  evaluateUserId  String   @map("evaluate_user_id") @db.Char(16)
+  evaluatedUserId String   @map("evaluated_user_id") @db.Char(16)
+  score           Int      @map("score") @db.UnsignedInt
+  comment         String   @map("comment") @db.VarChar(140)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  evaluateUser  User        @relation("evaluateUser", fields: [evaluateUserId], references: [id])
+  evaluatedUser User        @relation("evaluatedUser", fields: [evaluatedUserId], references: [id])
+
+  @@id(id)
+  @@unique([reservationId, evaluateUserId, evaluatedUserId])
+  @@index([side, evaluateUserId])
+  @@index([side, evaluatedUserId])
+  @@map("evaluation")
+}
+
+model Chat {
+  id            String   @map("id") @db.Char(16)
+  version       Int      @default(0) @map("version")
+  sendUserId    String   @map("send_user_id") @db.Char(16)
+  receiveUserId String   @map("receive_user_id") @db.Char(16)
+  comment       String   @map("comment") @db.VarChar(300)
+  sendAt        DateTime @map("send_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  sendUser    User @relation("sendUser", fields: [sendUserId], references: [id])
+  receiveUser User @relation("receiveUser", fields: [receiveUserId], references: [id])
+
+  @@id(id)
+  @@index([sendUserId, receiveUserId])
+  @@map("chat")
+}

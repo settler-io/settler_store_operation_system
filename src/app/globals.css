@@ -1,0 +1,24 @@
+/* PandaCSS */
+@layer reset, base, tokens, recipes, utilities;
+
+/* PandaCSSで対応できないpseudoのスタイル */
+dialog::backdrop {
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.16);
+  transition: opacity 0.15s ease-in-out;
+}
+
+dialog[open]::backdrop {
+  opacity: 1;
+}
+
+/* 著作権法の問題で、画像を保存できないようにする必要があるための対応 */
+img {
+  /* PCの右クリック禁止 */
+  pointer-events: none;
+  /* SPの長押し禁止 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}

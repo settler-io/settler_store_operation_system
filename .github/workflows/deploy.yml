@@ -1,0 +1,60 @@
+name: deploy
+on:
+  workflow_call:
+    inputs:
+      aws-role-to-assume-arn:
+        type: string
+        required: true
+      apprunner-access-role-arn:
+        type: string
+        required: true
+      apprunner-service-name:
+        type: string
+        required: true
+      ecr-repository-name:
+        type: string
+        required: true
+
+jobs:
+  deploy:
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+
+      - id: aws-credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ap-northeast-1
+          role-to-assume: ${{ inputs.aws-role-to-assume-arn }}
+
+      - id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - id: build-image
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: "${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository-name }}:${{ github.sha }}"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy AppRunner
+        id: deploy-apprunner
+        uses: awslabs/amazon-app-runner-deploy@main
+        with:
+          service: ${{ inputs.apprunner-service-name }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository-name }}:${{ github.sha }}
+          access-role-arn: ${{ inputs.apprunner-access-role-arn }}
+          region: ap-northeast-1
+          cpu: 1
+          memory: 2
+          port: 3000
+          wait-for-service-stability-seconds: 900
+      - name: App Runner output
+        run: echo "App runner output ${{ steps.deploy-apprunner.outputs.service-id }}"

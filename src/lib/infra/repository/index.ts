@@ -1,0 +1,10 @@
+export { AttractionRepository } from "./attraction-repository";
+export { ChatRepository } from "./chat-repository";
+export { EmailVerificationTokenRepository } from "./email-verification-token-repository";
+export { EvaluationRepository } from "./evaluation-repository";
+export { HostImageRepository } from "./host-image-repository";
+export { ReservationRepository } from "./reservation-repository";
+export { UserGameRepository } from "./user-game-repository";
+export { UserRepository } from "./user-repository";
+export { UserSettingRepository } from "./user-setting-repository";
+export { ViewHistoryRepository } from "./view-history-repository";
