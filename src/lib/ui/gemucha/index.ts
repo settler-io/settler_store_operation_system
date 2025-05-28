@@ -1,5 +1,4 @@
 export { AttractionItem } from "./attraction-item";
-export { Calendar } from "./calendar";
 export { ChatsList } from "./chats-list";
 export { DotLine, DotLineProfile } from "./dot-line";
 export { EarningItem, EarningItemMonthlySales } from "./earning-item";

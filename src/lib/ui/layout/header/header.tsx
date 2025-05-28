@@ -8,11 +8,8 @@ import { usePathname } from "next/navigation";
 import { css } from "styled-system/css";
 import { hstack } from "styled-system/patterns";
 // import { UserLine } from "../footer/icons";
-import { LoginNavigationBar } from "./login-navigation-bar";
 
 export function Header({ isDev }: { isDev: boolean }) {
-  const pathname = usePathname();
-
   return (
     <header
       className={css({
