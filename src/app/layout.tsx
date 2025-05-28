@@ -1,5 +1,4 @@
 import { config } from "@/application/config";
-import { MainMenu } from "@/ui/gemucha";
 import { Footer, GoogleTagManagerScript, Header, ToastContainerProvider } from "@/ui/layout";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -62,7 +61,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             })}
           >
             <Header isDev={isDev} />
-            <MainMenu />
             <main
               className={css({
                 flex: "1",

@@ -1,9 +1,7 @@
 "use client";
 
 import { PageUrl } from "@/application/url";
-import { MenuItemHeader } from "@/ui/gemucha";
 import { default as Link } from "next/link";
-import { usePathname } from "next/navigation";
 // import type { SVGProps } from "react";
 import { css } from "styled-system/css";
 import { hstack } from "styled-system/patterns";
@@ -71,23 +69,6 @@ function LogoAndSearchIconBar({ isDev }: { isDev: boolean }) {
             // alignItems: "center",
           })}
         >
-          <MenuItemHeader
-            url={PageUrl.attraction.top}
-            title={
-              <span
-                className={css({
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  // fontSize: "1rem",
-                  whiteSpace: "nowrap",
-                })}
-              >
-                <span>募集板</span>
-              </span>
-            }
-            isHeader
-          />
         </div>
         <div
           className={css({
@@ -96,24 +77,6 @@ function LogoAndSearchIconBar({ isDev }: { isDev: boolean }) {
             alignItems: "center",
           })}
         >
-          <MenuItemHeader
-            url={PageUrl.mypage.chat.top}
-            title={
-              <span
-                className={css({
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  // fontSize: "1rem",
-                  whiteSpace: "nowrap",
-                })}
-              >
-                <span>チャット</span>
-                {/* <ChatIcon />{" "} */}
-              </span>
-            }
-            isHeader
-          />
         </div>
         <div
           className={css({
@@ -122,24 +85,6 @@ function LogoAndSearchIconBar({ isDev }: { isDev: boolean }) {
             alignItems: "center",
           })}
         >
-          <MenuItemHeader
-            url={PageUrl.mypage.top}
-            title={
-              <span
-                className={css({
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "flex-end",
-                  // fontSize: "1rem",
-                  whiteSpace: "nowrap",
-                })}
-              >
-                <span>マイページ</span>
-                {/* <UserLine /> */}
-              </span>
-            }
-            isHeader
-          />
         </div>
       </div>
     </>
