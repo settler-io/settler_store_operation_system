@@ -9,7 +9,24 @@ export async function POST(req: NextRequest) {
   console.log("hehehe")
   //console.log(tansactionLog)
   for (const [key, value] of Object.entries(tansactionLog)) {
-    console.log(`${key}: ${value}`);
+    for (const element of value) {
+      console.log(element);
+      const receiptID = element.receiptID
+      const orderHistory = element.orderHistory
+      const orderData = element.orderData
+      const entryTime = element.entrytime
+      const outtime = element.outtime
+      const stayedMinutes = element.stayedMinutes
+      const total = element.total
+      const totalReduce = element.totalReduce
+      const tax = element.tax
+      const taxInternal = element.taxInternal
+      const taxReducedInternal = element.taxReducedInternal
+      const discount = element.discount
+      console.log(receiptID);
+    }
+    //console.log(value);
+    //console.log(receiptID);
   }
 
   return new NextResponse("", {
