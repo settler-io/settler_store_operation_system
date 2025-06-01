@@ -7,7 +7,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Transactions {
+model Transaction {
   id                      String   @map("id") @db.Char(16)
   version                 Int      @default(0) @map("version")
   total                   Int      @default(0) @map("total")
@@ -23,13 +23,11 @@ model Transactions {
   createdAt               DateTime @default(now()) @map("created_at")
   updatedAt               DateTime @default(now()) @updatedAt @map("updated_at")
 
-  viewUser   User @relation("viewUser", fields: [viewUserId], references: [id])
-  viewedUser User @relation("viewedUser", fields: [viewedUserId], references: [id])
+  orderHistory         OrderHistory[] 
 
   @@id(id)
-  @@index([viewUserId, viewAt])
-  @@index([viewedUserId, viewAt])
-  @@map("view_history")
+  @@index([entryTime, outTime])
+  @@map("transaction")
 }
 
 model OrderHistory {
@@ -38,41 +36,36 @@ model OrderHistory {
   transactionId     String   @map("transaction_id") @db.Char(16)
   lineUserId        String   @map("line_user_id") @db.Char(32)
   lineUserName      String   @map("line_user_name") @db.Char(32)
-  orderType         DateTime @map("out_time")
-  orderedTime       DateTime @map("out_time")
+  orderType         DateTime @map("order_type")
+  orderedTime       DateTime @map("ordered_time")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id])
+  orderItem         OrderItem[] 
+  transaction Transaction @relation(fields: [transactionId], references: [id])
 
   @@id(id)
-  @@index([userId, startAt])
-  @@index([startAt])
-  @@map("attraction")
+  @@index([orderedTime])
+  @@map("order_history")
 }
 
 model OrderItem {
   id                    String  @map("id") @db.Char(16)
   version               Int     @default(0) @map("version")
   orderHistoryId        String  @map("order_history_id") @db.Char(16)
-  menuId                Int     @default(0) @map("tax_internal")
-  name                  String  @map("line_user_name") @db.Char(32)
-  count                 Int     @default(0) @map("tax_internal")
-  price                 Int     @default(0) @map("tax_internal")
-  unitPrice             Int     @default(0) @map("tax_internal")
-  timechargeMinutes     Int     @default(0) @map("tax_internal")
+  menuId                Int     @default(0) @map("menu_id")
+  name                  String  @map("name") @db.Char(32)
+  count                 Int     @default(0) @map("count")
+  price                 Int     @default(0) @map("price")
+  unitPrice             Int     @default(0) @map("unit_price")
+  timechargeMinutes     Int     @default(0) @map("timecharge_minutes")
 
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
 
-  reservation   Reservation @relation(fields: [reservationId], references: [id])
-  evaluateUser  User        @relation("evaluateUser", fields: [evaluateUserId], references: [id])
-  evaluatedUser User        @relation("evaluatedUser", fields: [evaluatedUserId], references: [id])
+  orderHistory OrderHistory @relation(fields: [orderHistoryId], references: [id])
 
   @@id(id)
-  @@unique([reservationId, evaluateUserId, evaluatedUserId])
-  @@index([side, evaluateUserId])
-  @@index([side, evaluatedUserId])
-  @@map("evaluation")
+  @@map("order_item")
 }
