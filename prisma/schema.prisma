@@ -8,7 +8,7 @@ generator client {
 }
 
 model Transaction {
-  id                      String   @map("id") @db.Char(16)
+  id                      String   @map("id") @db.Char(32)
   version                 Int      @default(0) @map("version")
   total                   Int      @default(0) @map("total")
   totalReduced            Int      @default(0) @map("total_reduced")
@@ -31,12 +31,12 @@ model Transaction {
 }
 
 model OrderHistory {
-  id                String   @map("id") @db.Char(16)
+  id                String   @map("id") @db.Char(64)
   version           Int      @default(0) @map("version")
-  transactionId     String   @map("transaction_id") @db.Char(16)
-  lineUserId        String   @map("line_user_id") @db.Char(32)
-  lineUserName      String   @map("line_user_name") @db.Char(32)
-  orderType         DateTime @map("order_type")
+  transactionId     String   @map("transaction_id") @db.Char(32)
+  lineUserId        String   @map("line_user_id") @db.Char(64)
+  lineUserName      String   @map("line_user_name") @db.Char(64)
+  orderType         String   @map("order_type") @db.Char(16)
   orderedTime       DateTime @map("ordered_time")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -51,7 +51,7 @@ model OrderHistory {
 }
 
 model OrderItem {
-  id                    String  @map("id") @db.Char(16)
+  id                    String  @map("id") @db.Char(32)
   version               Int     @default(0) @map("version")
   orderHistoryId        String  @map("order_history_id") @db.Char(16)
   menuId                Int     @default(0) @map("menu_id")
