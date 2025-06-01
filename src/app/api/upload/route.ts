@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       for (const element of orderHistory) {
         console.log("aaaaa")
         console.log(element.lineUser)
-        const id = receiptID + element.orderedTime
+        const order_history_id = receiptID + element.orderedTime
         const lineUserId = element.lineUser == null ? "" : element.lineUser.lineUserId
         const lineUserName = element.lineUser == null ? "" : element.lineUser.lineUserName
         const orderType = element.orderType
@@ -53,11 +53,28 @@ export async function POST(req: NextRequest) {
 
         connection.query(
           'INSERT INTO order_history (id, version, transaction_id, line_user_id, line_user_name, order_type, ordered_time) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [id, 1, receiptID, lineUserId, lineUserName, orderType, orderedTime],
+          [order_history_id, 1, receiptID, lineUserId, lineUserName, orderType, orderedTime],
           (error: any, results: any) => {
             console.log(error)
           }
         );
+        for(const [key, orderValue] of Object.entries(element.orderData)) {
+          const orderItem = orderData.find((e: any) => e.id == key)
+          const menuId = orderItem.menuId
+          const name = orderItem.name
+          const count = orderItem.count
+          const price = orderItem.price
+          const unitPrice = orderItem.unitPrice
+          const basedMinutes = orderItem.timeBasedBilling.basedMinutes
+
+          connection.query(
+            'INSERT INTO order_item (id, version, order_history_id, menu_id, name, count, price, unit_price, timecharge_minutes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [key, 1, order_history_id, menuId, name, count, price, unitPrice, basedMinutes],
+            (error: any, results: any) => {
+              console.log(error)
+            }
+          );
+        }
       }
     }
   }

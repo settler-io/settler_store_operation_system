@@ -53,7 +53,7 @@ model OrderHistory {
 model OrderItem {
   id                    String  @map("id") @db.Char(32)
   version               Int     @default(0) @map("version")
-  orderHistoryId        String  @map("order_history_id") @db.Char(16)
+  orderHistoryId        String  @map("order_history_id") @db.Char(64)
   menuId                Int     @default(0) @map("menu_id")
   name                  String  @map("name") @db.Char(32)
   count                 Int     @default(0) @map("count")
