@@ -8,13 +8,20 @@ generator client {
 }
 
 model Transactions {
-  id           String   @map("id") @db.Char(16)
-  version      Int      @default(0) @map("version")
-  lineUserId   String   @map("view_user_id") @db.Char(16)
-  lineUserName String   @map("viewed_user_id") @db.Char(16)
-  viewAt       DateTime @map("view_at")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  id                      String   @map("id") @db.Char(16)
+  version                 Int      @default(0) @map("version")
+  total                   Int      @default(0) @map("total")
+  totalReduced            Int      @default(0) @map("total_reduced")
+  tax                     Int      @default(0) @map("tax")
+  taxInternal             Int      @default(0) @map("tax_internal")
+  taxReduced              Int      @default(0) @map("tax_reduced")
+  taxReducedInternal      Int      @default(0) @map("tax_reduced_internal")
+  discount                Int      @default(0) @map("discount")
+  entryTime               DateTime @map("entry_time")
+  outTime                 DateTime @map("out_time")
+
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @default(now()) @updatedAt @map("updated_at")
 
   viewUser   User @relation("viewUser", fields: [viewUserId], references: [id])
   viewedUser User @relation("viewedUser", fields: [viewedUserId], references: [id])
@@ -25,13 +32,15 @@ model Transactions {
   @@map("view_history")
 }
 
-model Orders {
-  id        String   @map("id") @db.Char(16)
-  version   Int      @default(0) @map("version")
-  userId    String   @map("user_id") @db.Char(16)
-  message   String   @map("message") @db.VarChar(140)
-  startAt   DateTime @map("start_at")
-  endAt     DateTime @map("end_at")
+model OrderHistory {
+  id                String   @map("id") @db.Char(16)
+  version           Int      @default(0) @map("version")
+  transactionId     String   @map("transaction_id") @db.Char(16)
+  lineUserId        String   @map("line_user_id") @db.Char(32)
+  lineUserName      String   @map("line_user_name") @db.Char(32)
+  orderType         DateTime @map("out_time")
+  orderedTime       DateTime @map("out_time")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
@@ -43,15 +52,17 @@ model Orders {
   @@map("attraction")
 }
 
-model Evaluation {
-  id              String   @map("id") @db.Char(16)
-  version         Int      @default(0) @map("version")
-  reservationId   String   @map("reservation_id") @db.Char(16)
-  side            String   @map("side") @db.VarChar(10)
-  evaluateUserId  String   @map("evaluate_user_id") @db.Char(16)
-  evaluatedUserId String   @map("evaluated_user_id") @db.Char(16)
-  score           Int      @map("score") @db.UnsignedInt
-  comment         String   @map("comment") @db.VarChar(140)
+model OrderItem {
+  id                    String  @map("id") @db.Char(16)
+  version               Int     @default(0) @map("version")
+  orderHistoryId        String  @map("order_history_id") @db.Char(16)
+  menuId                Int     @default(0) @map("tax_internal")
+  name                  String  @map("line_user_name") @db.Char(32)
+  count                 Int     @default(0) @map("tax_internal")
+  price                 Int     @default(0) @map("tax_internal")
+  unitPrice             Int     @default(0) @map("tax_internal")
+  timechargeMinutes     Int     @default(0) @map("tax_internal")
+
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
 
