@@ -9,6 +9,7 @@ services:
       - MYSQL_USER=app
       - MYSQL_PASSWORD=password
       - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_ROOT_HOST=%
       - TZ=UTC
     command: >
       mysqld 
