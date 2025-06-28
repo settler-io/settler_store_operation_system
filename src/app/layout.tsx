@@ -13,7 +13,7 @@ import "./globals.css";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "ゲムチャ",
+  title: "むさぽ神田",
   description: "",
   metadataBase: new URL(config.origin + "/"),
 };

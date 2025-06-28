@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       const orderData = element.orderData
       const entryTime = element.entrytime.replace("T", " ").replace("Z", "")
       const outTime = element.outtime.replace("T", " ").replace("Z", "")
-      const stayedMinutes = element.stayedMinutes
+      //const stayedMinutes = element.stayedMinutes
       const total = element.total
       const totalReduce = element.totalReduce == null ? 0 : element.totalReduce
       const tax = element.tax

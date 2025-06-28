@@ -1,8 +1,15 @@
+import { config } from "@/application/config";
 import { PrismaClient } from '@prisma/client';
 import { MkLeaderBoard } from "@/ui/layout/mkleaderboard";
+import type { Metadata } from "next";
 
 const prisma = new PrismaClient();
 
+export const metadata: Metadata = {
+  title: "むさぽ神田リーダーボード",
+  description: "",
+  metadataBase: new URL(config.origin + "/"),
+};
 
 export default async function Page() {
   
