@@ -69,3 +69,35 @@ model OrderItem {
   @@id(id)
   @@map("order_item")
 }
+
+
+model RingResult {
+  id                    Int                       @map("id")
+  version               Int                       @map("version")
+  myId                  String                    @map("myId")                 @db.Char(64)
+  nickname              String                    @map("nickname")             @db.Char(64)
+  storeName             String                    @map("storeName")            @db.Char(64)
+  status                Int                       @map("status")
+  checkIn               DateTime                  @map("checkIn")
+  checkOut              DateTime                  @map("checkOut")
+  buyIn                 Int                       @map("buyIn")
+  cashOut               Int                       @map("cashOut")
+  rate                  String                    @map("rate")                @db.Char(64)
+  playingTime           Decimal                   @map("playingTime")
+  result                Decimal                   @map("result")
+  resultBB              Decimal                   @map("resultBB")
+  netResult             Int                       @map("netResult")
+  netResultBB           Decimal                   @map("netResultBB")
+  totalPlayingTime      Decimal                   @map("totalPlayingTime")
+  adjustedResult        Decimal                   @map("adjustedResult")
+  adjustedNetResult     Decimal                   @map("adjustedNetResult")
+  adjustedNetResultBB   Decimal                   @map("adjustedNetResultBB")
+  adjustedHourlyWage    Decimal                   @map("adjustedHourlyWage")
+
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@id(id)
+  @@map("ring_result")
+}

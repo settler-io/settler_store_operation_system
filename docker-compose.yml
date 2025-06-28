@@ -5,12 +5,12 @@ services:
     container_name: toreca-swap-db
     image: mysql:5.7
     environment:
-      - MYSQL_DATABASE=torecaswap
-      - MYSQL_USER=app
-      - MYSQL_PASSWORD=password
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_ROOT_HOST=%
-      - TZ=UTC
+      MYSQL_DATABASE: torecaswap
+      MYSQL_USER: app
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_HOST: '%'
+      TZ: UTC
     command: >
       mysqld 
         --character-set-server=utf8mb4 

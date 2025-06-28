@@ -26,7 +26,6 @@ export function Header({ isDev }: { isDev: boolean }) {
         // fontFamily: "NicoKaku-v2",
       })}
     >
-      <LogoAndSearchIconBar isDev={isDev} />
     </header>
   );
 }

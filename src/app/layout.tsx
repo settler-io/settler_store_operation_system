@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
       <body
         className={css({
-          minHeight: "100dvh",
+          minHeight: "300dvh",
           background: "#e7e9ed",
           textStyle: "base",
           color: "textDefault",

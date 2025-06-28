@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function Footer(props: Props) {
-  return <TemporaryTermsLinkSection isDev={props.isDev} />;
+  return <div></div>;
 }
 
 function TemporaryTermsLinkSection({ isDev }: { isDev: boolean }) {
