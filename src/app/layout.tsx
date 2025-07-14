@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
       <body
         className={css({
-          minHeight: "300dvh",
+          //minHeight: "300dvh",
           background: "#e7e9ed",
           textStyle: "base",
           color: "textDefault",
@@ -54,23 +54,26 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
               flexDirection: "column",
               margin: "auto",
               width: "100%",
-              paddingBottom: "10vh",
+              backgroundImage: `url("/logo.jpg")`,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              backgroundBlendMode: "darken",
+              backgroundPosition: "360px",
+              //paddingBottom: "10vh",
               // minHeight: "100dvh",
-              background: "#ffffff",
-              position: "relative",
+              //background: "#ffffff",
+              //position: "relative",
             })}
           >
-            <Header isDev={isDev} />
+            
             <main
               className={css({
                 flex: "1",
-                background: "#ffffff",
+                //background: "#ffffff",
               })}
             >
               {children}
             </main>
           </div>
-          <Footer isDev={isDev} />
       </body>
     </html>
   );
