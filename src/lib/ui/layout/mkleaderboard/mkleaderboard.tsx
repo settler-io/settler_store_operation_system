@@ -1,18 +1,43 @@
 "use client";
 
-export function MkLeaderBoard({params}: {params: Array<any>}) {
-  return (
-    params.map((row, index) => (
-      <tr>
-        <td style={{verticalAlign: "top", fontSize: "64px", paddingBottom: "60px"}}>{index + 1}位</td>
-        <td style={{verticalAlign: "top", fontSize: "64px", paddingBottom: "60px", paddingRight: "10px"}}>{row["_max"]['nickname']}</td>
-        <td style={{verticalAlign: "top", fontSize: "64px", paddingBottom: "60px", textAlign: "right"}}>{row["_sum"]['result']} MD</td>
-      </tr>
-      //        <div key={index} style={{paddingBottom: "20px", color:'rgba(255, 255, 255)'}}>
-//          <div style={{display: "inline-block", verticalAlign: "top", fontSize: "32px", paddingRight: "20px"}}>{index + 1}位</div>
-//          <div style={{display: "inline-block", verticalAlign: "top", fontSize: "32px", paddingInlineEnd: "5em"}}>{row["_max"]['nickname']}</div>
-//          <div style={{display: "inline-block", verticalAlign: "top", fontSize: "32px", paddingRight: "20px"}}>{row["_sum"]['result']} MD</div>
-//        </div>
-    ))
+import React, { useState } from 'react'
+import useInterval from 'use-interval';
+import { MkLeaderBoardTable } from "./mkleaderboard-table";
+
+export function MkLeaderBoard({onethree_result, twofive_result}: {onethree_result: Array<any>, twofive_result: Array<any>}) {
+    const [counter, setCount] = useState(0)
+    useInterval(() => {
+      const count = counter > 2 ? 0 : counter + 1
+      setCount(count);
+    }, 5000);
+    const index = counter * 5
+
+    return (
+<div style={{textShadow: "1px 1px 2px black", paddingTop: "100px", height: "1200px", backgroundImage: `url("/logo.jpg")`, backgroundColor: 'rgba(0, 0, 0, 0.95)', backgroundBlendMode: "darken", backgroundPosition: "360px"}}>
+<div style={{verticalAlign: "top", textAlign: "center", fontSize: "120px", color:'rgba(255, 255, 255)'}}>
+    MUSAPO-KANDA-<br/><br/><br/><br/><br/><br/>
+    Leader Board
+  </div>  
+
+<div style={{display: "inline-block", verticalAlign: "top", paddingLeft: "10%", paddingRight: "30%px", paddingTop: "12%"}}>
+<p style={{fontSize: "72px", paddingBottom: "80px", paddingLeft: "240px", color:'rgba(255, 255, 255)'}}>1-3-3</p>
+<table style={{display: "inline-block", verticalAlign: "top", fontSize: "32px", color:'rgba(255, 255, 255)'}}>
+  <tbody>
+    <MkLeaderBoardTable params={onethree_result.slice(index, index + 5)} counter={index} />
+  </tbody>
+</table>
+
+</div>
+
+<div style={{display: "inline-block", verticalAlign: "top", paddingTop: "12%", paddingLeft:"320px"}}>
+<p style={{fontSize: "72px", paddingBottom: "80px", paddingLeft: "200px", color:'rgba(255, 255, 255)'}}>2-5-5</p>
+<table style={{display: "inline-block", verticalAlign: "top", fontSize: "32px", color:'rgba(255, 255, 255)'}}>
+  <tbody>
+    <MkLeaderBoardTable params={twofive_result.slice(index, index + 5)} counter={index}/>
+  </tbody>
+ 
+</table>
+</div>
+</div>
   )
 } 

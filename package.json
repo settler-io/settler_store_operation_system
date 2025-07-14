@@ -36,6 +36,7 @@
     "react-modal": "^3.16.1",
     "react-select": "^5.8.0",
     "react-toastify": "^10.0.5",
+    "use-interval": "1.4.0",
     "remeda": "^2.0.5",
     "serialize-error": "^11.0.3",
     "swiper": "^11.1.4",
