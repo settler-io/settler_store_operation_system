@@ -12,12 +12,17 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
+  const monthBegin = new Date().getMonth() + 1;
+  const monthEnd = new Date().getMonth() + 2;
+  const monthBeginZeroPad = ('0' + monthBegin).slice(-2)
+  const monthEndZeroPad = ('0' + monthEnd).slice(-2)
+
   let onethree_result = await prisma.ringResult.groupBy({
       by: ['myId'],
       where: {
         checkIn: {
-          gte: "2025-06-30T00:00:00.000Z",
-          lt: "2025-08-01T00:00:00.000Z",
+          gte: `2025-${monthBeginZeroPad}-01T00:00:00.000Z`,
+          lt: `2025-${monthEndZeroPad}-01T00:00:00.000Z`,
         },
         rate: " 1-3"
 
@@ -36,8 +41,8 @@ export default async function Page() {
     by: ['myId'],
     where: {
       checkIn: {
-        gte: "2025-06-30T00:00:00.000Z",
-        lt: "2025-08-01T00:00:00.000Z",
+        gte: `2025-${monthBeginZeroPad}-01T00:00:00.000Z`,
+        lt: `2025-${monthEndZeroPad}-01T00:00:00.000Z`,
       },
       rate: " 2-5"
 
