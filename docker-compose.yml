@@ -7,8 +7,8 @@ services:
     environment:
       MYSQL_DATABASE: torecaswap
       MYSQL_USER: app
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: settlerakihabara0601
+      MYSQL_ROOT_PASSWORD: settlerakihabara0601
       MYSQL_ROOT_HOST: '%'
       TZ: UTC
     command: >
