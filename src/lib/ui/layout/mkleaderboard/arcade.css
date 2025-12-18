@@ -1,0 +1,210 @@
+/* 平成ゲーセン風スタイル - ドット基調でおしゃれに */
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes glitch {
+  0%, 100% {
+    text-shadow:
+      2px 0 #ff00ff,
+      -2px 0 #00ffff,
+      0 0 20px #00ffff,
+      0 0 40px #ff00ff;
+  }
+  25% {
+    text-shadow:
+      -2px 0 #ff00ff,
+      2px 0 #00ffff,
+      0 0 20px #ff00ff,
+      0 0 40px #00ffff;
+  }
+  50% {
+    text-shadow:
+      2px 2px #ff00ff,
+      -2px -2px #00ffff,
+      0 0 30px #00ffff,
+      0 0 50px #ff00ff;
+  }
+  75% {
+    text-shadow:
+      -2px 2px #00ffff,
+      2px -2px #ff00ff,
+      0 0 25px #ff00ff,
+      0 0 45px #00ffff;
+  }
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 10px #0ff,
+      0 0 20px #0ff,
+      0 0 30px #0ff,
+      inset 0 0 10px #0ff;
+  }
+  50% {
+    box-shadow:
+      0 0 20px #0ff,
+      0 0 40px #0ff,
+      0 0 60px #0ff,
+      inset 0 0 20px #0ff;
+  }
+}
+
+@keyframes blink {
+  0%, 49%, 100% {
+    opacity: 1;
+  }
+  50%, 99% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* CRTスクリーンエフェクト */
+.crt-screen {
+  position: relative;
+  overflow: hidden;
+}
+
+.crt-screen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 255, 255, 0.03) 0px,
+    rgba(0, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+.crt-screen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 255, 255, 0.05) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
+  animation: scanline 8s linear infinite;
+}
+
+/* ドットフォント風テキスト */
+.pixel-text {
+  font-family: 'Courier New', 'Courier', monospace;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ネオンボーダー */
+.neon-border {
+  border: 3px solid #0ff;
+  box-shadow:
+    0 0 10px #0ff,
+    0 0 20px #0ff,
+    inset 0 0 10px #0ff;
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+/* グリッドパターン背景 */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ランク表示のグロー効果 */
+.rank-glow-1st {
+  color: #FFD700;
+  text-shadow:
+    0 0 10px #FFD700,
+    0 0 20px #FFD700,
+    0 0 30px #FFD700,
+    0 0 40px #FFA500;
+  animation: blink 3s infinite;
+}
+
+.rank-glow-2nd {
+  color: #C0C0C0;
+  text-shadow:
+    0 0 10px #C0C0C0,
+    0 0 20px #C0C0C0,
+    0 0 30px #C0C0C0;
+}
+
+.rank-glow-3rd {
+  color: #CD7F32;
+  text-shadow:
+    0 0 10px #CD7F32,
+    0 0 20px #CD7F32,
+    0 0 30px #CD7F32;
+}
+
+.rank-glow-default {
+  color: #00FFFF;
+  text-shadow:
+    0 0 5px #00FFFF,
+    0 0 10px #00FFFF;
+}
+
+/* テーブル行のアニメーション */
+.arcade-row {
+  animation: slide-up 0.5s ease-out;
+  transition: all 0.3s ease;
+}
+
+.arcade-row:hover {
+  transform: scale(1.02);
+  background: rgba(0, 255, 255, 0.1) !important;
+}
+
+/* レトロなボタン風ヘッダー */
+.arcade-header {
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  border: 4px solid;
+  border-color: #0ff #008080 #008080 #0ff;
+  position: relative;
+}
+
+.arcade-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+}
