@@ -47,10 +47,6 @@ export const config = {
   },
 
   get masterPassword() {
-    // MASTER_PASSWORDが設定されていないと空文字列でパスワードやJWTのハッシュ処理をしてしまうリスクがあるため、念の為エラーにしておく
-    if (!process.env["MASTER_PASSWORD"]) {
-      throw new Error("process.env.MASTER_PASSWORD not set");
-    }
 
     return process.env["MASTER_PASSWORD"];
   },
