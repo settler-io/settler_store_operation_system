@@ -50,7 +50,6 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                   fontSize: 'clamp(2rem, 5vw, 5rem)',
                   color: '#00FFFF',
                   textShadow: '0 0 20px #00FFFF, 0 0 40px #FF00FF, 4px 4px 0 #000',
-                  animation: 'glitch 5s infinite',
                   margin: 0,
                   lineHeight: 1.2
                 }}>
@@ -72,7 +71,6 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
               <div style={{flex: 1, display: 'flex', justifyContent: 'center', minHeight: 0}}>
                 <div className="neon-border" style={{
                   background: 'rgba(0, 0, 0, 0.8)',
-                  backdropFilter: 'blur(10px)',
                   padding: '2rem',
                   borderRadius: '8px',
                   width: '100%',
@@ -154,7 +152,6 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                   fontSize: 'clamp(2rem, 5vw, 5rem)',
                   color: '#00FFFF',
                   textShadow: '0 0 20px #00FFFF, 0 0 40px #FF00FF, 4px 4px 0 #000',
-                  animation: 'glitch 5s infinite',
                   margin: 0,
                   lineHeight: 1.2
                 }}>
@@ -176,7 +173,6 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
               <div style={{flex: 1, display: 'flex', justifyContent: 'center', minHeight: 0}}>
                 <div className="neon-border" style={{
                   background: 'rgba(0, 0, 0, 0.8)',
-                  backdropFilter: 'blur(10px)',
                   padding: '2rem',
                   borderRadius: '8px',
                   width: '100%',
@@ -258,7 +254,6 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                   fontSize: 'clamp(2rem, 5vw, 5rem)',
                   color: '#00FFFF',
                   textShadow: '0 0 20px #00FFFF, 0 0 40px #FF00FF, 4px 4px 0 #000',
-                  animation: 'glitch 5s infinite',
                   margin: 0,
                   lineHeight: 1.2
                 }}>
@@ -280,7 +275,6 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
               <div style={{flex: 1, display: 'flex', justifyContent: 'center', minHeight: 0}}>
                 <div className="neon-border" style={{
                   background: 'rgba(0, 0, 0, 0.8)',
-                  backdropFilter: 'blur(10px)',
                   padding: '2rem',
                   borderRadius: '8px',
                   width: '100%',

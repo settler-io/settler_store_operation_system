@@ -46,7 +46,6 @@ export function MkLeaderBoardTable({params, counter}: {params: Array<any>, count
             style={{
               background: rankBg,
               borderBottom: '2px solid rgba(0, 255, 255, 0.3)',
-              animationDelay: `${index * 0.1}s`,
               height: `${100 / params.length}%`
             }}
           >
