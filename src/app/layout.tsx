@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "むさぽ神田リーダーボード",
+  title: "むさぽ神田ランキング",
   description: "",
 };
 
