@@ -167,23 +167,12 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                   padding: '0.75rem 1.5rem',
                   display: 'inline-block'
                 }}>
-                  リングランキング
+                  リングランキング <span style={{color: '#00FF00'}}>（2-5-5）</span>
                 </div>
               </div>
 
               {/* 2-5-5テーブル */}
               <div style={{flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0}}>
-                <div className="arcade-header pixel-text" style={{
-                  fontSize: 'clamp(1.2rem, 3vw, 3rem)',
-                  color: '#00FF00',
-                  textShadow: '0 0 20px #00FF00, 2px 2px 0 #000',
-                  textAlign: 'center',
-                  padding: '0.75rem 1.5rem',
-                  marginBottom: '0.5rem',
-                  flexShrink: 0
-                }}>
-                  2-5-5
-                </div>
                 <div style={{flex: 1, display: 'flex', minHeight: 0}}>
                   <div className="neon-border" style={{
                     width: '100%',
@@ -285,23 +274,12 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                   padding: '0.75rem 1.5rem',
                   display: 'inline-block'
                 }}>
-                  リングランキング
+                  リングランキング <span style={{color: '#FF1493'}}>（1-3-3）</span>
                 </div>
               </div>
 
               {/* 1-3-3テーブル */}
               <div style={{flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0}}>
-                <div className="arcade-header pixel-text" style={{
-                  fontSize: 'clamp(1.2rem, 3vw, 3rem)',
-                  color: '#FF1493',
-                  textShadow: '0 0 20px #FF1493, 2px 2px 0 #000',
-                  textAlign: 'center',
-                  padding: '0.75rem 1.5rem',
-                  marginBottom: '0.5rem',
-                  flexShrink: 0
-                }}>
-                  1-3-3
-                </div>
                 <div style={{flex: 1, display: 'flex', minHeight: 0}}>
                   <div className="neon-border" style={{
                     width: '100%',
