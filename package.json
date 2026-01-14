@@ -5,6 +5,8 @@
   "scripts": {
     "build": "rm -fr .next && panda codegen && next build",
     "dev": "panda codegen && next dev",
+    "ws": "node websocket-server.js",
+    "dev:all": "concurrently \"npm run ws\" \"npm run dev\"",
     "format": "prettier --write .",
     "lint": "prettier --check . && next lint"
   },
@@ -13,7 +15,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "use-interval": "1.4.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "ws": "^8.14.2"
   },
   "devDependencies": {
     "@pandacss/dev": "^0.40.1",
@@ -21,6 +24,7 @@
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "eslint": "^8.51.0",
+    "concurrently": "^8.2.2",
     "eslint-config-next": "^14.2.3",
     "prettier": "^3.3.1",
     "prettier-plugin-organize-imports": "^3.2.4",
