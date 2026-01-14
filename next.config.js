@@ -1,12 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  output: "export",
+  images: {
+    unoptimized: true,
+  },
   compress: false,
   poweredByHeader: false,
-  eslint: { // eslintのlint checkをbuild時にoff
+  eslint: {
     ignoreDuringBuilds: true,
   },
-  typescript: { // type checkをbuild時にoff
+  typescript: {
     ignoreBuildErrors: true,
   }
 };

@@ -3,94 +3,33 @@
   "version": "0.1.1",
   "private": true,
   "scripts": {
-    "build": "rm -fr .next && prisma generate && panda codegen && next build",
+    "build": "rm -fr .next && panda codegen && next build",
     "dev": "panda codegen && next dev",
-    "format": "prisma format && prettier --write .",
-    "lint": "prettier --check . && next lint",
-    "start": "next start",
-    "test:unit": "npm run :prepare-unit-test && TZ=UTC vitest run --coverage --poolOptions.threads.singleThread",
-    "test:e2e": "playwright test",
-    "prepare": "husky install",
-    ":prepare-unit-test": "panda codegen && DATABASE_URL=mysql://root:password@127.0.0.1:3306/test prisma db push --force-reset"
+    "format": "prettier --write .",
+    "lint": "prettier --check . && next lint"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@hookform/resolvers": "^3.6.0",
-    "@paralleldrive/cuid2": "^2.2.2",
-    "@prisma/client": "^5.15.0",
-    "@types/react-image-gallery": "^1.2.4",
-    "date-fns": "^3.6.0",
-    "lodash.debounce": "^4.0.8",
-    "axios": "^1.9.0",
-    "mysql2": "^3.14.1",
     "next": "^14.2.3",
-    "next-auth": "^4.24.7",
-    "pino": "^9.1.0",
-    "pino-pretty": "^11.1.0",
-    "request": "^2.88.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-dropzone": "^14.2.3",
-    "react-hook-form": "^7.51.5",
-    "react-image-gallery": "^1.3.0",
-    "react-modal": "^3.16.1",
-    "react-select": "^5.8.0",
-    "react-toastify": "^10.0.5",
     "use-interval": "1.4.0",
-    "remeda": "^2.0.5",
-    "serialize-error": "^11.0.3",
-    "swiper": "^11.1.4",
-    "typescript": "^5.4.5",
-    "zod": "^3.23.8"
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@pandacss/dev": "^0.40.1",
-    "@playwright/test": "^1.44.1",
-    "@testing-library/jest-dom": "^6.4.5",
-    "@testing-library/react": "^16.0.0",
-    "@tsconfig/strictest": "^2.0.5",
-    "@types/lodash.debounce": "^4.0.9",
     "@types/node": "20.14.2",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
-    "@types/react-modal": "^3.16.3",
-    "@vitejs/plugin-react": "^4.3.0",
-    "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^8.51.0",
-    "iconv": "3.0.1",
     "eslint-config-next": "^14.2.3",
-    "husky": "^9.0.11",
-    "jsdom": "^24.1.0",
-    "lint-staged": "^15.2.5",
     "prettier": "^3.3.1",
     "prettier-plugin-organize-imports": "^3.2.4",
-    "prisma": "^5.15.0",
-    "tsconfig-paths": "^4.2.0",
-    "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^1.6.0"
-  },
-  "prisma": {
-    "seed": "npx ts-node -r tsconfig-paths/register --transpileOnly --compiler-options {\"module\":\"commonjs\"} prisma/seed/main.ts"
+    "tsconfig-paths": "^4.2.0"
   },
   "prettier": {
     "printWidth": 120,
     "plugins": [
       "prettier-plugin-organize-imports"
-    ]
-  },
-  "lint-staged": {
-    "*.{ts,tsx,html,css,scss,json,yml,yaml,md}": [
-      "prettier --write"
-    ],
-    "*.{ts,tsx}": [
-      "bash -c tsc"
-    ],
-    "src/**/*.test.{ts,tsx}": [
-      "vitest related --run --poolOptions.threads.singleThread"
-    ],
-    "prisma/schema.prisma": [
-      "prisma format"
     ]
   }
 }

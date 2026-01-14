@@ -8,13 +8,14 @@ import './arcade.css';
 export function MkLeaderBoard({onethree_result, twofive_result, tournament_result}: {onethree_result: Array<any>, twofive_result: Array<any>, tournament_result: Array<any>}) {
     const [counter, setCount] = useState(0)
     useInterval(() => {
-      const count = counter >= 12 ? 0 : counter + 1
+      const count = counter > 8 ? 0 : counter + 1
       setCount(count);
     }, 5000);
 
-    if (counter >= 8) {
+    // counter: 0-2 = 1-3-3, 3-5 = 2-5-5, 6-8 = トナメリーダーボード
+    if (counter >= 6) {
         // トナメリーダーボード
-        const index = (counter - 8) * 5
+        const index = (counter - 6) * 5
         return (
           <div className="crt-screen grid-bg" style={{
             width: '100vw',
@@ -63,18 +64,17 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                   padding: '1.3rem 0.75rem',
                   display: 'inline-block'
                 }}>
-                  トナメリーダーボード
+                  トナメランキング
                 </div>
               </div>
 
               {/* テーブル */}
-              <div style={{flex: 1, display: 'flex', justifyContent: 'center', minHeight: 0}}>
+              <div style={{flex: 1, display: 'flex', minHeight: 0}}>
                 <div className="neon-border" style={{
                   background: 'rgba(0, 0, 0, 0.8)',
                   padding: '2rem',
                   borderRadius: '8px',
                   width: '100%',
-                  maxWidth: '1400px',
                   display: 'flex',
                   flexDirection: 'column'
                 }}>
@@ -109,14 +109,15 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                 color: '#0FF',
                 fontSize: 'clamp(0.75rem, 1.5vw, 1rem)'
               }}>
-                {counter - 2}/3 ●●●
+                {counter - 5}/3 ●●●
               </div>
             </div>
           </div>
         )
-    } else if (counter >= 4) {
-        // 2-5-5
-        const index = (counter - 4) * 5
+    } else if (counter >= 3) {
+        // 2-5-5 リーダーボード
+        const index = (counter - 3) * 5
+
         return (
           <div className="crt-screen grid-bg" style={{
             width: '100vw',
@@ -134,7 +135,7 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(128,0,128,0.4), rgba(0,0,0,0.9))'
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,128,0,0.4), rgba(0,0,0,0.9))'
             }} />
 
             {/* メインコンテンツ */}
@@ -165,32 +166,36 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                   padding: '1.0rem 0.75rem',
                   display: 'inline-block'
                 }}>
-                  2-5-5
+                  リングランキング <span style={{color: '#00FF00'}}>（2-5-5）</span>
                 </div>
               </div>
 
-              {/* テーブル */}
-              <div style={{flex: 1, display: 'flex', justifyContent: 'center', minHeight: 0}}>
-                <div className="neon-border" style={{
-                  background: 'rgba(0, 0, 0, 0.8)',
-                  padding: '2rem',
-                  borderRadius: '8px',
-                  width: '100%',
-                  maxWidth: '1400px',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}>
-                  <table className="pixel-text" style={{
+              {/* 2-5-5テーブル */}
+              <div style={{flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0}}>
+                <div style={{flex: 1, display: 'flex', minHeight: 0}}>
+                  <div className="neon-border" style={{
                     width: '100%',
-                    height: '100%',
-                    tableLayout: 'fixed',
-                    borderCollapse: 'separate',
-                    borderSpacing: 0
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    padding: '2rem',
+                    borderRadius: '8px',
+                    borderColor: '#00FF00',
+                    boxShadow: '0 0 10px #00FF00, 0 0 20px #00FF00, inset 0 0 10px #00FF00',
+                    display: 'flex',
+                    flexDirection: 'column'
                   }}>
-                    <tbody style={{height: '100%', display: 'table', width: '100%'}}>
+                    <table className="pixel-text" style={{
+                      width: '100%',
+                      height: '100%',
+                      tableLayout: 'fixed',
+                      borderCollapse: 'separate',
+                      borderSpacing: 0
+                    }}>
+                      <tbody style={{height: '100%', display: 'table', width: '100%'}}>
                         <MkLeaderBoardTable params={twofive_result.slice(index, index + 5)} counter={index}/>
-                    </tbody>
-                  </table>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
 
@@ -217,8 +222,9 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
           </div>
         )
     } else {
-        // 1-3-3
+        // 1-3-3 リーダーボード
         const index = counter * 5
+
         return (
           <div className="crt-screen grid-bg" style={{
             width: '100vw',
@@ -236,7 +242,7 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(128,0,128,0.4), rgba(0,0,0,0.9))'
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(255,20,147,0.4), rgba(0,0,0,0.9))'
             }} />
 
             {/* メインコンテンツ */}
@@ -264,35 +270,39 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                   color: '#FFD700',
                   textShadow: '0 0 20px #FFD700, 2px 2px 0 #000',
                   marginTop: '0.5rem',
-                  padding: '1.0rem 0.75rem',
+                  padding: '0.75rem 1.5rem',
                   display: 'inline-block'
                 }}>
-                  1-3-3
+                  リングランキング <span style={{color: '#FF1493'}}>（1-3-3）</span>
                 </div>
               </div>
 
-              {/* テーブル */}
-              <div style={{flex: 1, display: 'flex', justifyContent: 'center', minHeight: 0}}>
-                <div className="neon-border" style={{
-                  background: 'rgba(0, 0, 0, 0.8)',
-                  padding: '2rem',
-                  borderRadius: '8px',
-                  width: '100%',
-                  maxWidth: '1400px',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}>
-                  <table className="pixel-text" style={{
+              {/* 1-3-3テーブル */}
+              <div style={{flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0}}>
+                <div style={{flex: 1, display: 'flex', minHeight: 0}}>
+                  <div className="neon-border" style={{
                     width: '100%',
-                    height: '100%',
-                    tableLayout: 'fixed',
-                    borderCollapse: 'separate',
-                    borderSpacing: 0
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    padding: '2rem',
+                    borderRadius: '8px',
+                    borderColor: '#FF1493',
+                    boxShadow: '0 0 10px #FF1493, 0 0 20px #FF1493, inset 0 0 10px #FF1493',
+                    display: 'flex',
+                    flexDirection: 'column'
                   }}>
-                    <tbody style={{height: '100%', display: 'table', width: '100%'}}>
-                        <MkLeaderBoardTable params={onethree_result.slice(index, index + 5)} counter={index}/>
-                    </tbody>
-                  </table>
+                    <table className="pixel-text" style={{
+                      width: '100%',
+                      height: '100%',
+                      tableLayout: 'fixed',
+                      borderCollapse: 'separate',
+                      borderSpacing: 0
+                    }}>
+                      <tbody style={{height: '100%', display: 'table', width: '100%'}}>
+                        <MkLeaderBoardTable params={onethree_result.slice(index, index + 5)} counter={index} />
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
 
@@ -313,7 +323,7 @@ export function MkLeaderBoard({onethree_result, twofive_result, tournament_resul
                 color: '#0FF',
                 fontSize: 'clamp(0.75rem, 1.5vw, 1rem)'
               }}>
-                {counter - 2}/3 ●●●
+                {counter + 1}/3 ●●●
               </div>
             </div>
           </div>

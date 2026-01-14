@@ -1,4 +1,4 @@
-/* 平成ゲーセン風スタイル - ドット基調でおしゃれに */
+/* 平成ゲーセン風スタイル - ドット基調でおしゃれに（アニメーション無効化） */
 
 /* CRTスクリーンエフェクト */
 .crt-screen {
@@ -102,12 +102,7 @@
 
 /* テーブル行 */
 .arcade-row {
-  transition: all 0.3s ease;
-}
-
-.arcade-row:hover {
-  transform: scale(1.02);
-  background: rgba(0, 255, 255, 0.1) !important;
+  transition: none;
 }
 
 /* レトロなボタン風ヘッダー */
