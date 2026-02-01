@@ -1,0 +1,14 @@
+{
+  "name": "order-monitor",
+  "version": "1.0.0",
+  "description": "Monitor orders from choose-monster-app.com and send to Discord",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "puppeteer": "^21.6.1"
+  }
+}

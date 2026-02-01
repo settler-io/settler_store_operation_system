@@ -1,0 +1,24 @@
+{
+  "name": "smaregi-discord-bot",
+  "version": "1.0.0",
+  "description": "スマレジの前日取引履歴を取得してDiscordに投稿するボット",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "setup": "tsx src/setup.ts",
+    "debug-raw": "tsx src/debug-raw.ts",
+    "debug-customer": "tsx src/debug-customer.ts",
+    "debug-customer-transactions": "tsx src/debug-customer-transactions.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.5"
+  }
+}
