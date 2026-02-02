@@ -36,19 +36,27 @@ export interface DeviceCategory {
 }
 
 export interface GaReport {
+  siteName: string;
   daily: DailyMetrics;
   topPages: PageMetrics[];
   trafficSources: TrafficSource[];
   devices: DeviceCategory[];
 }
 
+export interface SiteConfig {
+  name: string;
+  propertyId: string;
+}
+
 export class GaClient {
   private client: BetaAnalyticsDataClient;
   private propertyId: string;
+  private siteName: string;
 
-  constructor(propertyId: string) {
+  constructor(propertyId: string, siteName: string = "") {
     this.client = new BetaAnalyticsDataClient();
     this.propertyId = propertyId;
+    this.siteName = siteName;
   }
 
   /**
@@ -74,6 +82,7 @@ export class GaClient {
     ]);
 
     return {
+      siteName: this.siteName,
       daily,
       topPages,
       trafficSources,

@@ -1,0 +1,28 @@
+{
+  "name": "x-reminder-bot",
+  "version": "1.0.0",
+  "description": "X（Twitter）の投稿を監視してDiscordに通知するボット",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "debug": "DEBUG_MODE=true tsx src/index.ts",
+    "debug:time": "DEBUG_MODE=true tsx src/index.ts",
+    "save-cookies": "tsx src/save-cookies.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3",
+    "puppeteer": "^22.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/node-cron": "^3.0.11",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.5"
+  }
+}

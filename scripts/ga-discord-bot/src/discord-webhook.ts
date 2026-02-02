@@ -98,7 +98,7 @@ export class DiscordWebhook {
    */
   async sendGaReport(report: GaReport): Promise<void> {
     // メインメトリクスEmbed（デバイス別含む）
-    const mainEmbed = this.createMainEmbed(report.daily, report.devices);
+    const mainEmbed = this.createMainEmbed(report.siteName, report.daily, report.devices);
 
     // ページEmbed
     const pagesEmbed = this.createPagesEmbed(report.topPages);
@@ -114,7 +114,7 @@ export class DiscordWebhook {
   /**
    * メインメトリクスEmbedを作成
    */
-  private createMainEmbed(daily: DailyMetrics, devices: DeviceCategory[]): DiscordEmbed {
+  private createMainEmbed(siteName: string, daily: DailyMetrics, devices: DeviceCategory[]): DiscordEmbed {
     // デバイス別の文字列を作成
     const totalSessions = devices.reduce((sum, d) => sum + d.sessions, 0);
     const deviceStr = devices.length > 0
@@ -125,8 +125,9 @@ export class DiscordWebhook {
         }).join(" / ")
       : "-";
 
+    const titlePrefix = siteName ? `【${siteName}】` : "";
     return {
-      title: `📊 ${daily.date} Google Analytics レポート`,
+      title: `📊 ${titlePrefix}${daily.date} Google Analytics レポート`,
       color: 0x5865f2,
       fields: [
         {

@@ -1,0 +1,16 @@
+[Unit]
+Description=Smaregi Accounting Bot
+After=network.target
+
+[Service]
+Type=simple
+User=contabo
+WorkingDirectory=/home/contabo/work/settler_store_operation_system/scripts/smaregi-accounting-bot
+ExecStart=/home/contabo/.nvm/versions/node/v24.12.0/bin/node /home/contabo/work/settler_store_operation_system/scripts/smaregi-accounting-bot/dist/index.js
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/contabo/work/settler_store_operation_system/scripts/smaregi-accounting-bot/logs/bot.log
+StandardError=append:/home/contabo/work/settler_store_operation_system/scripts/smaregi-accounting-bot/logs/bot.log
+
+[Install]
+WantedBy=multi-user.target
