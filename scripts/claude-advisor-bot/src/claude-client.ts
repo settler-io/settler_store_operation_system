@@ -199,9 +199,14 @@ ${schemaInfo}
     // 今回のユーザーメッセージ
     messages.push({ role: "user", content: userMessage });
 
+    // データ収集フェーズ: Sonnet（高速・安価・レートリミット緩い）
+    const TOOL_MODEL = "claude-sonnet-4-5-20250929";
+    // 最終回答フェーズ: Opus（高品質な分析・アドバイス）
+    const ANSWER_MODEL = "claude-opus-4-6";
+
     // Claude APIを呼び出し（ツール使用のループ）
     let response = await this.anthropic.messages.create({
-      model: "claude-opus-4-6",
+      model: TOOL_MODEL,
       max_tokens: 4096,
       system: this.systemPrompt,
       tools: [BIGQUERY_TOOL, READ_GITHUB_TOOL, FETCH_URL_TOOL, CALL_API_TOOL],
@@ -455,10 +460,21 @@ ${schemaInfo}
       messages.push({ role: "user", content: toolResults });
 
       response = await this.anthropic.messages.create({
-        model: "claude-opus-4-6",
+        model: TOOL_MODEL,
         max_tokens: 4096,
         system: this.systemPrompt,
         tools: [BIGQUERY_TOOL, READ_GITHUB_TOOL, FETCH_URL_TOOL, CALL_API_TOOL],
+        messages,
+      });
+    }
+
+    // 最終回答をOpusで生成（ツールを使った場合のみ、より高品質な分析を行う）
+    if (messages.length > conversationHistory.length + 1) {
+      console.log("  [Model Switch] Sonnet → Opus for final answer");
+      response = await this.anthropic.messages.create({
+        model: ANSWER_MODEL,
+        max_tokens: 4096,
+        system: this.systemPrompt,
         messages,
       });
     }
