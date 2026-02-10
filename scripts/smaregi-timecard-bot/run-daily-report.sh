@@ -1,10 +1,10 @@
 #!/bin/bash
-# スマレジ日報Bot - 日次実行スクリプト
+# スマレジタイムカードBot - 日次実行スクリプト
 
-cd /home/contabo/work/settler_store_operation_system/scripts/smaregi-discord-bot
+cd /home/contabo/work/settler_store_operation_system/scripts/smaregi-timecard-bot
 
 # ログファイル
-LOG_FILE="/home/contabo/work/settler_store_operation_system/scripts/smaregi-discord-bot/logs/$(date +%Y-%m-%d).log"
+LOG_FILE="/home/contabo/work/settler_store_operation_system/scripts/smaregi-timecard-bot/logs/$(date +%Y-%m-%d).log"
 mkdir -p "$(dirname "$LOG_FILE")"
 
 echo "========================================" >> "$LOG_FILE"
@@ -15,8 +15,8 @@ echo "========================================" >> "$LOG_FILE"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# 実行（店舗ID: 2）
-npx tsx src/index.ts --store=2 >> "$LOG_FILE" 2>&1
+# 実行（全店舗）
+npm run start -- --all-stores >> "$LOG_FILE" 2>&1
 
 echo "実行完了: $(date)" >> "$LOG_FILE"
 echo "" >> "$LOG_FILE"

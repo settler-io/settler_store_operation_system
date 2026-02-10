@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+logs/
+debug-*.png
+debug-*.txt
+screenshots/
+.last-state.json
+temp-tweet-image.png

@@ -5,17 +5,17 @@
 
 import dotenv from "dotenv";
 import cron from "node-cron";
-import { createXClientFromEnv } from "./x-client.js";
+import { createApifyClientFromEnv } from "./apify-client.js";
 import { createDiscordWebhookFromEnv } from "./discord-webhook.js";
-import { writeFileSync, appendFileSync, existsSync } from "fs";
+import { appendFileSync } from "fs";
 import { join } from "path";
 
 // 環境変数を読み込み
 dotenv.config();
 
 const KEYWORD = "店内状況";
-const ACTIVE_HOURS = [17, 18, 19, 20, 21, 22]; // 17:00-22:00 JST
-const WEEKDAYS = [1, 2, 3, 4, 5]; // 月〜金
+const ACTIVE_HOURS = [17, 20]; // 17:00, 20:00 JST
+const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6]; // 毎日（日〜土）
 
 // デバッグモード
 const DEBUG_MODE = process.env.DEBUG_MODE === "true";
@@ -105,18 +105,27 @@ function isActiveTime(): boolean {
  * 今日の0時0分0秒を取得（JST基準）
  */
 function getTodayStart(): Date {
-  const now = getJSTTime();
-  const today = new Date(now);
-  today.setHours(0, 0, 0, 0);
+  const now = getCurrentTime();
 
-  // JSTからUTCに戻す
-  const jstOffset = 9 * 60; // 分単位
-  const utcTime = new Date(today.getTime() - jstOffset * 60 * 1000);
+  // JSTに変換（UTC + 9時間）
+  const jstOffset = 9 * 60 * 60 * 1000; // ミリ秒単位
+  const jstNow = new Date(now.getTime() + jstOffset);
 
-  log(`Today's start (JST 00:00): ${today.toISOString()}`);
-  log(`Today's start (UTC): ${utcTime.toISOString()}`);
+  // JSTで今日の0時0分0秒を取得
+  const jstTodayStart = new Date(Date.UTC(
+    jstNow.getUTCFullYear(),
+    jstNow.getUTCMonth(),
+    jstNow.getUTCDate(),
+    0, 0, 0, 0
+  ));
 
-  return utcTime;
+  // UTCに戻す（JST 0時 = UTC -9時間）
+  const utcTodayStart = new Date(jstTodayStart.getTime() - jstOffset);
+
+  log(`Today's start (JST 00:00): ${jstTodayStart.toISOString()}`);
+  log(`Today's start (UTC): ${utcTodayStart.toISOString()}`);
+
+  return utcTodayStart;
 }
 
 /**
@@ -127,32 +136,33 @@ async function runCheck(): Promise<void> {
 
   // 稼働時間かチェック
   if (!isActiveTime()) {
-    log("Not in active time (weekdays 17:00-22:00 JST), skipping check");
+    log("Not in active time (daily 17:00, 20:00 JST), skipping check");
     return;
   }
 
   try {
-    const xClient = createXClientFromEnv();
+    const apifyClient = createApifyClientFromEnv();
     const discord = createDiscordWebhookFromEnv();
     const roleId = process.env.DISCORD_ROLE_ID || "むさぽ神田メンバー";
+    const username = process.env.TWITTER_USERNAME || "634poker_kanda";
 
     log("Fetching today's posts...");
 
     // 今日の投稿を取得
     const todayStart = getTodayStart();
-    const posts = await xClient.getUserTweets(todayStart);
+    const posts = await apifyClient.getUserTweets(username, todayStart);
 
     log(`Found ${posts.length} posts today`);
 
     // デバッグモードの場合、全ポストを表示
     if (DEBUG_MODE) {
-      posts.forEach((post, index) => {
+      posts.forEach((post: any, index: number) => {
         log(`🐛 Post ${index + 1}: [${post.createdAt.toISOString()}] ${post.text.substring(0, 50)}...`);
       });
     }
 
     // キーワードを含む投稿をフィルタリング
-    const matchedPosts = xClient.filterPostsByKeyword(posts, KEYWORD);
+    const matchedPosts = apifyClient.filterPostsByKeyword(posts, KEYWORD);
 
     log(`Found ${matchedPosts.length} posts containing "${KEYWORD}"`);
 
@@ -191,9 +201,9 @@ async function main(): Promise<void> {
   log("X Reminder Bot started");
   log(`Monitoring keyword: "${KEYWORD}"`);
   log(
-    `Active time: Weekdays ${ACTIVE_HOURS[0]}:00-${ACTIVE_HOURS[ACTIVE_HOURS.length - 1]}:59 JST`
+    `Active time: Every day ${ACTIVE_HOURS.map(h => `${h}:00`).join(", ")} JST`
   );
-  log(`Check schedule: Every hour at 0 minutes (17:00, 18:00, 19:00, 20:00, 21:00, 22:00)`);
+  log(`Check schedule: Daily at ${ACTIVE_HOURS.map(h => `${h}:00`).join(", ")}`);
 
   if (DEBUG_MODE) {
     log("🐛 DEBUG MODE ENABLED");
@@ -213,10 +223,10 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  // 毎時0分に実行（cronパターン: "0 * * * *"）
+  // 17:00と20:00に実行（cronパターン: "0 17,20 * * *"）
   // JSTタイムゾーンを指定
   cron.schedule(
-    "0 * * * *",
+    "0 17,20 * * *",
     async () => {
       await runCheck();
     },
@@ -225,7 +235,7 @@ async function main(): Promise<void> {
     }
   );
 
-  log("Cron job scheduled. Bot will check every hour at 0 minutes (JST).");
+  log("Cron job scheduled. Bot will check daily at 17:00 and 20:00 JST.");
   log("Waiting for next scheduled time...");
 }
 

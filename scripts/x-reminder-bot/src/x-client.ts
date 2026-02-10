@@ -458,8 +458,19 @@ export class XClient {
         timeout: 60000,
       });
 
-      // ページが読み込まれるまで待機
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      // ページが読み込まれるまで待機（少し長めに）
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      // デバッグ: ページ全体で「店内状況」を検索
+      const pageText = await page.evaluate(() => {
+        // @ts-ignore - このコードはブラウザコンテキストで実行される
+        return document.body.innerText;
+      });
+      const has店内状況 = pageText.includes('店内状況');
+      console.log(`Page contains '店内状況': ${has店内状況}`);
+      if (has店内状況) {
+        console.log('Found 店内状況 in page text!');
+      }
 
       // 指定日時まで遡ってツイートを取得
       const allTweets = await this.scrollAndCollectTweets(page, sinceDate);
@@ -467,13 +478,16 @@ export class XClient {
       console.log(`Found ${allTweets.length} tweets on the page`);
 
       // XPostオブジェクトに変換し、日付でフィルタリング
+      // sinceDate = 今日の0時、endDate = 明日の0時
+      const endDate = new Date(sinceDate.getTime() + 24 * 60 * 60 * 1000);
+
       const posts: XPost[] = allTweets
         .map((tweet, index) => ({
           id: `tweet-${index}`,
           text: tweet.text,
           createdAt: new Date(tweet.time),
         }))
-        .filter((post) => post.createdAt >= sinceDate);
+        .filter((post) => post.createdAt >= sinceDate && post.createdAt < endDate);
 
       return posts;
     } catch (error) {
@@ -491,14 +505,15 @@ export class XClient {
     page: Page,
     sinceDate: Date
   ): Promise<{ text: string; time: string }[]> {
-    const MAX_SCROLLS = 30;
+    const MAX_SCROLLS = 50; // スクロール回数を増やす
     const SCROLL_DELAY = 2000;
     let scrollCount = 0;
     let previousTweetCount = 0;
     let noNewTweetsCount = 0;
+    let oldTweetsFoundCount = 0; // 古いツイートが見つかった回数
 
     console.log(
-      `Target date: ${sinceDate.toISOString()}, scrolling until we find older tweets...`
+      `Target date: ${sinceDate.toISOString()}, scrolling to collect all recent tweets...`
     );
 
     while (scrollCount < MAX_SCROLLS) {
@@ -541,12 +556,23 @@ export class XClient {
           `Scroll ${scrollCount + 1}: Found ${tweets.length} tweets, oldest: ${oldestDate.toISOString()}`
         );
 
-        // 指定日時より古いツイートが見つかったら終了
+        // 指定日時より古いツイートが見つかったらカウント
         if (oldestDate < sinceDate) {
+          oldTweetsFoundCount++;
           console.log(
-            `Found tweets older than target date. Stopping scroll.`
+            `Found tweets older than target date (${oldTweetsFoundCount}/3)`
           );
-          return tweets;
+
+          // 3回連続で古いツイートが見つかったら終了
+          if (oldTweetsFoundCount >= 3) {
+            console.log(
+              `Found old tweets 3 times in a row. Stopping scroll.`
+            );
+            return tweets;
+          }
+        } else {
+          // 新しいツイートが見つかったらカウントをリセット
+          oldTweetsFoundCount = 0;
         }
       }
 
@@ -562,14 +588,17 @@ export class XClient {
         previousTweetCount = tweets.length;
       }
 
-      // スクロール
+      // スクロール（ランダムな距離で人間らしく）
       await page.evaluate(() => {
         // @ts-ignore - このコードはブラウザコンテキストで実行される
-        window.scrollBy(0, window.innerHeight);
+        const scrollDistance = Math.floor(Math.random() * 300) + window.innerHeight * 0.7;
+        // @ts-ignore
+        window.scrollBy(0, scrollDistance);
       });
 
-      // 待機
-      await new Promise((resolve) => setTimeout(resolve, SCROLL_DELAY));
+      // ランダムな待機時間（2-4秒）
+      const randomDelay = Math.floor(Math.random() * 2000) + 2000;
+      await new Promise((resolve) => setTimeout(resolve, randomDelay));
 
       scrollCount++;
     }

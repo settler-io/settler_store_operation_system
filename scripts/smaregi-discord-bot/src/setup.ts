@@ -1,117 +1,51 @@
 /**
- * スマレジプラットフォームAPI 初回セットアップスクリプト
+ * スマレジプラットフォームAPI 接続テストスクリプト
+ *
+ * Client Credentials Grant を使用するため、ユーザー認可は不要です。
+ * このスクリプトは環境変数の設定確認と接続テストを行います。
  *
  * 使用方法:
  *   npm run setup
- *
- * このスクリプトは以下を行います:
- * 1. 一時的なローカルサーバーを起動
- * 2. 認可URLを表示
- * 3. ブラウザで認可後、自動的にコールバックを受け取る
- * 4. 認可コードをアクセストークンに交換
- * 5. トークンをファイルに保存
  */
 
 import "dotenv/config";
-import * as http from "http";
-import { URL } from "url";
 import { createSmaregiAuthFromEnv } from "./smaregi-auth.js";
-
-const PORT = 3311;
 
 async function main(): Promise<void> {
   console.log("========================================");
-  console.log("スマレジプラットフォームAPI セットアップ");
+  console.log("スマレジプラットフォームAPI 接続テスト");
   console.log("========================================\n");
 
-  const auth = createSmaregiAuthFromEnv();
-
-  // 既に認証済みかチェック
-  if (auth.isAuthenticated()) {
-    console.log("既に認証済みです。再認証する場合は .smaregi-token.json を削除してください。");
-    process.exit(0);
-  }
-
-  // 認可コードを受け取るためのPromise
-  const codePromise = new Promise<string>((resolve, reject) => {
-    const server = http.createServer((req, res) => {
-      const url = new URL(req.url || "", `http://localhost:${PORT}`);
-
-      if (url.pathname === "/callback") {
-        const code = url.searchParams.get("code");
-        const error = url.searchParams.get("error");
-
-        if (error) {
-          res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
-          res.end(`<h1>エラー</h1><p>${error}</p><p>このウィンドウを閉じてください。</p>`);
-          reject(new Error(`Authorization error: ${error}`));
-          server.close();
-          return;
-        }
-
-        if (code) {
-          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-          res.end(`
-            <html>
-              <head><title>認証成功</title></head>
-              <body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
-                <h1>認証成功！</h1>
-                <p>このウィンドウを閉じて、ターミナルに戻ってください。</p>
-              </body>
-            </html>
-          `);
-          resolve(code);
-          // 少し待ってからサーバーを閉じる
-          setTimeout(() => server.close(), 1000);
-          return;
-        }
-      }
-
-      // その他のリクエスト
-      res.writeHead(404, { "Content-Type": "text/plain" });
-      res.end("Not Found");
-    });
-
-    server.listen(PORT, () => {
-      console.log(`コールバックサーバーを起動しました (http://localhost:${PORT})`);
-    });
-
-    server.on("error", (err: NodeJS.ErrnoException) => {
-      if (err.code === "EADDRINUSE") {
-        reject(new Error(`ポート ${PORT} は既に使用されています。他のプロセスを終了してください。`));
-      } else {
-        reject(err);
-      }
-    });
-
-    // タイムアウト（5分）
-    setTimeout(() => {
-      server.close();
-      reject(new Error("タイムアウト: 5分以内に認可を完了してください。"));
-    }, 5 * 60 * 1000);
-  });
-
-  // 認可URLを表示
-  const authUrl = auth.getAuthorizationUrl();
-  console.log("\n以下のURLをブラウザで開いて、アプリを認可してください:\n");
-  console.log("----------------------------------------");
-  console.log(authUrl);
-  console.log("----------------------------------------\n");
-  console.log("認可が完了するまで待機中...\n");
-
   try {
-    // 認可コードを待つ
-    const code = await codePromise;
-    console.log("認可コードを受け取りました。トークンを取得中...\n");
+    // 環境変数チェック
+    const requiredEnvVars = [
+      "SMAREGI_CLIENT_ID",
+      "SMAREGI_CLIENT_SECRET",
+      "SMAREGI_CONTRACT_ID",
+    ];
 
-    // トークンを取得
-    const tokenData = await auth.exchangeCodeForToken(code);
+    const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
+    if (missingVars.length > 0) {
+      console.error("以下の環境変数が設定されていません:");
+      missingVars.forEach((v) => console.error(`  - ${v}`));
+      console.error("\n.env ファイルを確認してください。");
+      process.exit(1);
+    }
+
+    console.log("環境変数チェック: OK\n");
+
+    // 認証インスタンス作成
+    const auth = createSmaregiAuthFromEnv();
+    console.log(`契約ID: ${auth.getContractId()}\n`);
+
+    // トークン取得テスト
+    console.log("アクセストークンを取得中...");
+    const token = await auth.getAccessToken();
+    console.log(`トークン取得: OK (${token.substring(0, 20)}...)\n`);
 
     console.log("========================================");
-    console.log("セットアップ完了！");
+    console.log("接続テスト完了！");
     console.log("========================================");
-    console.log(`契約ID: ${tokenData.contractId}`);
-    console.log(`トークン有効期限: ${tokenData.expiresAt}`);
     console.log("\nこれで日次レポートを実行できます:");
     console.log("  npm run dev   (開発モード)");
     console.log("  npm run start (本番モード)");

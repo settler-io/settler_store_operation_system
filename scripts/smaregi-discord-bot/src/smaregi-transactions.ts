@@ -25,6 +25,8 @@ interface TransactionDetail {
   unitDiscountPrice: number;
   unitDiscountRate: number;
   unitDiscountDivision: string;
+  cost: number | null;
+  costSum: number;
   taxRate: number;
   categoryId: string;
   categoryName: string;
@@ -76,6 +78,7 @@ export interface ProductSummary {
   categoryName: string;
   totalQuantity: number;
   totalAmount: number;
+  totalCost: number;
   transactionCount: number;
 }
 
@@ -134,14 +137,39 @@ export interface SalesSummary {
 }
 
 /**
+ * 割引の顧客別内訳
+ */
+export interface DiscountCustomerBreakdown {
+  customerId: string;
+  customerName: string;
+  discountAmount: number;
+  discountCount: number;
+}
+
+/**
+ * 割引・値引き集計結果
+ */
+export interface DiscountSummary {
+  productName: string;
+  categoryName: string;
+  discountAmount: number;    // 値引き合計金額
+  discountCount: number;     // 適用回数
+  discountRate: number;      // 割引率（%）（率割引の場合）
+  discountDivision: string;  // 割引区分
+  customerBreakdown: DiscountCustomerBreakdown[];  // 顧客別内訳
+}
+
+/**
  * 日次サマリー
  */
 export interface DailySummary {
   date: string;
   products: ProductSummary[];
   customers: CustomerSummary[];
+  discounts: DiscountSummary[];
   totalTransactions: number;
   totalAmount: number;
+  totalCost: number;
   totalQuantity: number;
   sales: SalesSummary;
 }
@@ -265,6 +293,7 @@ export class SmaregiTransactions {
             categoryName: detail.categoryName || "未分類",
             totalQuantity: 0,
             totalAmount: 0,
+            totalCost: 0,
             transactionCount: 0,
           });
         }
@@ -272,8 +301,10 @@ export class SmaregiTransactions {
         const summary = productMap.get(key)!;
         const qty = Number(detail.quantity) || 0;
         const price = Number(detail.salesPrice) || 0;
+        const costSum = Number(detail.costSum) || 0;
         summary.totalQuantity += qty;
         summary.totalAmount += price * qty;
+        summary.totalCost += costSum;
         summary.transactionCount += 1;
       }
     }
@@ -636,6 +667,89 @@ export class SmaregiTransactions {
   }
 
   /**
+   * 割引・値引きを集計（顧客別内訳つき）
+   * @param transactions 取引一覧
+   * @param customerNameMap 顧客ID→顧客名のマップ（顧客名解決済み）
+   */
+  aggregateDiscounts(transactions: TransactionHead[], customerNameMap: Map<string, string>): DiscountSummary[] {
+    // 商品別 → 顧客別の二重マップ
+    const discountMap = new Map<string, {
+      productName: string;
+      categoryName: string;
+      discountRate: number;
+      discountDivision: string;
+      customers: Map<string, { customerName: string; discountAmount: number; discountCount: number }>;
+    }>();
+
+    for (const transaction of transactions) {
+      if (!transaction.details) continue;
+
+      for (const detail of transaction.details) {
+        const unitDiscount = Number(detail.unitDiscountPrice) || 0;
+        if (unitDiscount <= 0) continue;
+
+        const qty = Number(detail.quantity) || 0;
+        const totalDiscount = unitDiscount * Math.abs(qty);
+        const productKey = detail.productId;
+
+        if (!discountMap.has(productKey)) {
+          discountMap.set(productKey, {
+            productName: detail.productName,
+            categoryName: detail.categoryName || "未分類",
+            discountRate: Number(detail.unitDiscountRate) || 0,
+            discountDivision: detail.unitDiscountDivision || "",
+            customers: new Map(),
+          });
+        }
+
+        const product = discountMap.get(productKey)!;
+
+        // 顧客キー
+        const customerId = transaction.customerId || `UNKNOWN_${transaction.transactionHeadId}`;
+        const customerName = customerNameMap.get(transaction.customerId || "") || "Unknown";
+
+        if (!product.customers.has(customerId)) {
+          product.customers.set(customerId, {
+            customerName,
+            discountAmount: 0,
+            discountCount: 0,
+          });
+        }
+
+        const customerEntry = product.customers.get(customerId)!;
+        customerEntry.discountAmount += totalDiscount;
+        customerEntry.discountCount += 1;
+      }
+    }
+
+    // DiscountSummary に変換
+    const results: DiscountSummary[] = [];
+    for (const [, data] of discountMap) {
+      const customerBreakdown: DiscountCustomerBreakdown[] = Array.from(data.customers.entries())
+        .map(([id, c]) => ({
+          customerId: id,
+          customerName: c.customerName,
+          discountAmount: c.discountAmount,
+          discountCount: c.discountCount,
+        }))
+        .sort((a, b) => b.discountAmount - a.discountAmount);
+
+      results.push({
+        productName: data.productName,
+        categoryName: data.categoryName,
+        discountAmount: customerBreakdown.reduce((sum, c) => sum + c.discountAmount, 0),
+        discountCount: customerBreakdown.reduce((sum, c) => sum + c.discountCount, 0),
+        discountRate: data.discountRate,
+        discountDivision: data.discountDivision,
+        customerBreakdown,
+      });
+    }
+
+    // 値引き金額の大きい順にソート
+    return results.sort((a, b) => b.discountAmount - a.discountAmount);
+  }
+
+  /**
    * 売上情報を集計
    */
   aggregateSales(transactions: TransactionHead[]): SalesSummary {
@@ -703,9 +817,19 @@ export class SmaregiTransactions {
   async createDailySummary(date: Date, transactions: TransactionHead[]): Promise<DailySummary> {
     const products = this.aggregateByProduct(transactions);
     const customers = await this.aggregateByCustomer(transactions);
+
+    // 顧客名マップを構築（割引集計で使用）
+    const customerNameMap = new Map<string, string>();
+    for (const c of customers) {
+      if (!c.customerId.startsWith("UNKNOWN_")) {
+        customerNameMap.set(c.customerId, c.customerName);
+      }
+    }
+    const discounts = this.aggregateDiscounts(transactions, customerNameMap);
     const sales = this.aggregateSales(transactions);
 
     const totalAmount = products.reduce((sum, p) => sum + p.totalAmount, 0);
+    const totalCost = products.reduce((sum, p) => sum + p.totalCost, 0);
     const totalQuantity = products.reduce((sum, p) => sum + p.totalQuantity, 0);
 
     const year = date.getFullYear();
@@ -716,8 +840,10 @@ export class SmaregiTransactions {
       date: `${year}/${month}/${day}`,
       products,
       customers,
+      discounts,
       totalTransactions: transactions.length,
       totalAmount,
+      totalCost,
       totalQuantity,
       sales,
     };
@@ -790,17 +916,29 @@ export class SmaregiTransactions {
     // 集計（週次サマリーでは顧客サマリー統計のみ必要、重複を許容）
     const products = this.aggregateByProduct(allTransactions);
     const customers = await this.aggregateByCustomerWithDuplicates(allTransactions);
+
+    // 顧客名マップを構築（割引集計で使用）
+    const customerNameMap = new Map<string, string>();
+    for (const c of customers) {
+      if (!c.customerId.startsWith("UNKNOWN_")) {
+        customerNameMap.set(c.customerId, c.customerName);
+      }
+    }
+    const discounts = this.aggregateDiscounts(allTransactions, customerNameMap);
     const sales = this.aggregateSales(allTransactions);
 
     const totalAmount = products.reduce((sum, p) => sum + p.totalAmount, 0);
+    const totalCost = products.reduce((sum, p) => sum + p.totalCost, 0);
     const totalQuantity = products.reduce((sum, p) => sum + p.totalQuantity, 0);
 
     return {
       date: dateLabel,
       products,
       customers, // 週次サマリーでは顧客サマリー統計のみ表示
+      discounts,
       totalTransactions: allTransactions.length,
       totalAmount,
+      totalCost,
       totalQuantity,
       sales,
     };

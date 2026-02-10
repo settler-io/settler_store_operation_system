@@ -2,3 +2,18 @@ node_modules/
 dist/
 .env
 logs/*.log
+
+# デバッグファイル
+debug-*.png
+debug-*.txt
+debug-*.html
+
+# Cookie認証ファイル（機密情報）
+twitter-cookies.json
+
+# 一時ファイル
+*.log
+*.tmp
+*.temp
+*~
+*.swp

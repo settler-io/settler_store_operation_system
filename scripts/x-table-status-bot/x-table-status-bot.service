@@ -1,0 +1,16 @@
+[Unit]
+Description=X Table Status Bot
+After=network.target
+
+[Service]
+Type=simple
+User=contabo
+WorkingDirectory=/home/contabo/work/settler_store_operation_system/scripts/x-table-status-bot
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

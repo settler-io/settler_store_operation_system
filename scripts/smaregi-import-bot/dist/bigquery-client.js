@@ -46,15 +46,9 @@ export class BigQueryClient {
             console.log(`Creating table: ${tableId}`);
             const [createdTable] = await table.create({
                 schema: schema,
-                timePartitioning: {
-                    type: "DAY",
-                    field: tableId === "transactions" || tableId === "transaction_details"
-                        ? "transaction_date_time"
-                        : "updated_at",
-                    // 有効期限を設定しない（無制限）
-                },
+                // パーティションなし - すべてのデータを保持
             });
-            console.log(`Table ${tableId} created with NO expiration.`);
+            console.log(`Table ${tableId} created without partitioning.`);
             return createdTable;
         }
         else {
@@ -74,9 +68,8 @@ export class BigQueryClient {
     /**
      * 取引ヘッダーデータを挿入（Load Job方式）
      * @param transactions - 挿入する取引データ
-     * @param targetDate - 対象日（指定した場合、その日のパーティションを上書き）
      */
-    async insertTransactions(transactions, targetDate) {
+    async insertTransactions(transactions) {
         if (transactions.length === 0)
             return;
         const rows = transactions.map((t) => ({
@@ -103,24 +96,10 @@ export class BigQueryClient {
             const table = this.bigquery.dataset(this.datasetId).table("transactions");
             const loadOptions = {
                 sourceFormat: "NEWLINE_DELIMITED_JSON",
+                writeDisposition: "WRITE_APPEND",
                 autodetect: false,
                 schema: transactionsSchema,
             };
-            // targetDateが指定されている場合、そのパーティションを上書き
-            if (targetDate) {
-                const dateStr = targetDate.toISOString().split("T")[0].replace(/-/g, "");
-                loadOptions.writeDisposition = "WRITE_TRUNCATE";
-                loadOptions.destinationTable = {
-                    projectId: this.projectId,
-                    datasetId: this.datasetId,
-                    tableId: `transactions$${dateStr}`,
-                };
-                console.log(`  - Partition mode: ${dateStr}`);
-            }
-            else {
-                loadOptions.writeDisposition = "WRITE_APPEND";
-                console.log(`  - Append mode`);
-            }
             const [job] = await table.load(tempFile, loadOptions);
             console.log(`  - Load Job started (Job: ${job.id})`);
             // CRITICAL: Load Jobが完了するまで待機してから一時ファイルを削除
@@ -145,9 +124,8 @@ export class BigQueryClient {
     /**
      * 取引明細データを挿入（Load Job方式）
      * @param details - 挿入する取引明細データ
-     * @param targetDate - 対象日（指定した場合、その日のパーティションを上書き）
      */
-    async insertTransactionDetails(details, targetDate) {
+    async insertTransactionDetails(details) {
         if (details.length === 0)
             return;
         const rows = details.map((d) => ({
@@ -173,22 +151,10 @@ export class BigQueryClient {
             const table = this.bigquery.dataset(this.datasetId).table("transaction_details");
             const loadOptions = {
                 sourceFormat: "NEWLINE_DELIMITED_JSON",
+                writeDisposition: "WRITE_APPEND",
                 autodetect: false,
                 schema: transactionDetailsSchema,
             };
-            // targetDateが指定されている場合、そのパーティションを上書き
-            if (targetDate) {
-                const dateStr = targetDate.toISOString().split("T")[0].replace(/-/g, "");
-                loadOptions.writeDisposition = "WRITE_TRUNCATE";
-                loadOptions.destinationTable = {
-                    projectId: this.projectId,
-                    datasetId: this.datasetId,
-                    tableId: `transaction_details$${dateStr}`,
-                };
-            }
-            else {
-                loadOptions.writeDisposition = "WRITE_APPEND";
-            }
             const [job] = await table.load(tempFile, loadOptions);
             console.log(`  - Inserted ${rows.length} transaction details (Job: ${job.id})`);
         }

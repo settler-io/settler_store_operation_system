@@ -2,7 +2,7 @@
  * Discord Webhook送信モジュール
  */
 
-import { DailySummary, ProductSummary, CustomerSummary } from "./smaregi-transactions.js";
+import { DailySummary, ProductSummary, CustomerSummary, DiscountSummary } from "./smaregi-transactions.js";
 
 interface DiscordEmbed {
   title?: string;
@@ -121,6 +121,16 @@ export class DiscordWebhook {
         value: this.formatCurrency(summary.sales.paygateSales),
         inline: true,
       },
+      {
+        name: "📦 原価合計",
+        value: this.formatCurrency(summary.totalCost),
+        inline: true,
+      },
+      {
+        name: "📈 粗利",
+        value: `${this.formatCurrency(summary.sales.netSales - summary.totalCost)} (${summary.sales.netSales > 0 ? Math.round(((summary.sales.netSales - summary.totalCost) / summary.sales.netSales) * 100) : 0}%)`,
+        inline: true,
+      },
     ];
 
     // 顧客統計フィールドを追加
@@ -223,6 +233,16 @@ export class DiscordWebhook {
         value: this.formatCurrency(summary.sales.changeReserve),
         inline: true,
       },
+      {
+        name: "📦 原価合計",
+        value: this.formatCurrency(summary.totalCost),
+        inline: true,
+      },
+      {
+        name: "📈 粗利",
+        value: `${this.formatCurrency(summary.sales.netSales - summary.totalCost)} (${summary.sales.netSales > 0 ? Math.round(((summary.sales.netSales - summary.totalCost) / summary.sales.netSales) * 100) : 0}%)`,
+        inline: true,
+      },
     ];
 
     // メインのサマリーEmbed
@@ -260,6 +280,14 @@ export class DiscordWebhook {
     for (let i = 1; i < productEmbeds.length; i += 10) {
       const batch = productEmbeds.slice(i, i + 10);
       await this.send({ embeds: batch });
+    }
+
+    // 割引・値引き一覧を送信
+    if (summary.discounts && summary.discounts.length > 0) {
+      const discountEmbed = this.createDiscountEmbed(summary.discounts);
+      if (discountEmbed) {
+        await this.send({ embeds: [discountEmbed] });
+      }
     }
 
     // 顧客リストがある場合は送信
@@ -300,8 +328,12 @@ export class DiscordWebhook {
       // 部門内の商品を売上順にソート
       const sortedProducts = categoryData.products.sort((a, b) => b.totalAmount - a.totalAmount);
 
+      // 部門の原価合計
+      const categoryTotalCost = categoryData.products.reduce((sum, p) => sum + p.totalCost, 0);
+
       // 部門ヘッダー
-      const categoryHeader = `📦 **${categoryName}** - ${categoryData.totalQuantity}点 / ${this.formatCurrency(categoryData.totalAmount)}`;
+      const costInfo = categoryTotalCost > 0 ? ` (原価: ${this.formatCurrency(categoryTotalCost)})` : "";
+      const categoryHeader = `📦 **${categoryName}** - ${categoryData.totalQuantity}点 / ${this.formatCurrency(categoryData.totalAmount)}${costInfo}`;
 
       // 部門ヘッダーが入らない場合は新しいEmbedを作成
       if (currentLength + categoryHeader.length + 1 > MAX_LENGTH && currentLines.length > 0) {
@@ -319,7 +351,8 @@ export class DiscordWebhook {
 
       // 各商品
       for (const p of sortedProducts) {
-        const productLine = `　・${p.productName} - ${p.totalQuantity}点 / ${this.formatCurrency(p.totalAmount)}`;
+        const productCostInfo = p.totalCost > 0 ? ` (原価: ${this.formatCurrency(p.totalCost)})` : "";
+        const productLine = `　・${p.productName} - ${p.totalQuantity}点 / ${this.formatCurrency(p.totalAmount)}${productCostInfo}`;
 
         // 文字数制限を超える場合は新しいEmbedを作成
         if (currentLength + productLine.length + 1 > MAX_LENGTH && currentLines.length > 0) {
@@ -353,6 +386,39 @@ export class DiscordWebhook {
     }
 
     return embeds;
+  }
+
+  /**
+   * 割引・値引き一覧のEmbedを作成
+   */
+  private createDiscountEmbed(discounts: DiscountSummary[]): DiscordEmbed | null {
+    if (discounts.length === 0) return null;
+
+    const totalDiscount = discounts.reduce((sum, d) => sum + d.discountAmount, 0);
+    const totalCount = discounts.reduce((sum, d) => sum + d.discountCount, 0);
+
+    const lines: string[] = [];
+    lines.push(`合計 ${totalCount}回 / -${this.formatCurrency(totalDiscount)}`);
+    lines.push("");
+
+    for (const d of discounts) {
+      let discountInfo = `-${this.formatCurrency(d.discountAmount)}`;
+      if (d.discountRate > 0) {
+        discountInfo += ` (${d.discountRate}%OFF)`;
+      }
+      lines.push(`**${d.productName}** - ${d.discountCount}回 / ${discountInfo}`);
+
+      // 顧客別内訳
+      for (const c of d.customerBreakdown) {
+        lines.push(`　　└ ${c.customerName} - ${c.discountCount}回 / -${this.formatCurrency(c.discountAmount)}`);
+      }
+    }
+
+    return {
+      title: "🏷️ 割引・値引き一覧",
+      description: lines.join("\n"),
+      color: 0xe67e22, // Orange
+    };
   }
 
   /**

@@ -1,0 +1,30 @@
+{
+  "name": "x-table-status-bot",
+  "version": "1.0.0",
+  "description": "テーブルの使用状況を取得してXに投稿するボット",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "debug": "DEBUG_MODE=true tsx src/index.ts",
+    "screenshot": "SCREENSHOT_ONLY=true tsx src/index.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "japanese-holidays": "^1.0.10",
+    "node-cron": "^3.0.3",
+    "puppeteer": "^22.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "twitter-api-v2": "^1.17.2"
+  },
+  "devDependencies": {
+    "@types/japanese-holidays": "^1.0.3",
+    "@types/node": "^20.11.0",
+    "@types/node-cron": "^3.0.11",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.5"
+  }
+}

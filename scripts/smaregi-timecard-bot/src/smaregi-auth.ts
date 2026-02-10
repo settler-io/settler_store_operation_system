@@ -39,6 +39,7 @@ const DEFAULT_SCOPES = [
   "pos.transactions:read",
   "pos.products:read",
   "pos.customers:read",
+  "timecard.shifts:read",
 ];
 
 export class SmaregiPlatformAuth {

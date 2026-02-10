@@ -19,7 +19,7 @@ function validateEnv() {
   const required = [
     "SMAREGI_CLIENT_ID",
     "SMAREGI_CLIENT_SECRET",
-    "SMAREGI_REDIRECT_URI",
+    "SMAREGI_CONTRACT_ID",
     "GOOGLE_SPREADSHEET_ID",
     "GOOGLE_SHEET_NAME",
     "GOOGLE_APPLICATION_CREDENTIALS",
@@ -48,7 +48,7 @@ async function recordYesterdayCashSales() {
     const auth = new SmaregiPlatformAuth({
       clientId: process.env.SMAREGI_CLIENT_ID!,
       clientSecret: process.env.SMAREGI_CLIENT_SECRET!,
-      redirectUri: process.env.SMAREGI_REDIRECT_URI!,
+      contractId: process.env.SMAREGI_CONTRACT_ID!,
       tokenFilePath: process.env.SMAREGI_TOKEN_FILE || "./.smaregi-token.json",
       useSandbox: process.env.SMAREGI_USE_SANDBOX === "true",
     });

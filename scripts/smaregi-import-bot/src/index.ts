@@ -18,7 +18,7 @@ function validateEnv() {
   const required = [
     "SMAREGI_CLIENT_ID",
     "SMAREGI_CLIENT_SECRET",
-    "SMAREGI_REDIRECT_URI",
+    "SMAREGI_CONTRACT_ID",
     "GCP_PROJECT_ID",
     "BIGQUERY_DATASET",
     "GOOGLE_APPLICATION_CREDENTIALS",
@@ -40,7 +40,7 @@ async function syncDaily() {
   const auth = new SmaregiPlatformAuth({
     clientId: process.env.SMAREGI_CLIENT_ID!,
     clientSecret: process.env.SMAREGI_CLIENT_SECRET!,
-    redirectUri: process.env.SMAREGI_REDIRECT_URI!,
+    contractId: process.env.SMAREGI_CONTRACT_ID!,
     tokenFilePath: process.env.SMAREGI_TOKEN_FILE || "./.smaregi-token.json",
     useSandbox: process.env.SMAREGI_USE_SANDBOX === "true",
   });
@@ -78,11 +78,11 @@ async function syncDaily() {
   }
 
   // 取引ヘッダーをBigQueryに挿入（昨日のパーティションを上書き）
-  await bqClient.insertTransactions(transactions, yesterday);
+  await bqClient.insertTransactions(transactions);
 
   // 取引明細を抽出してBigQueryに挿入（昨日のパーティションを上書き）
   const details = smaregiClient.extractTransactionDetails(transactions);
-  await bqClient.insertTransactionDetails(details, yesterday);
+  await bqClient.insertTransactionDetails(details);
 
   // 顧客データを取得してBigQueryに挿入
   const customerIds = smaregiClient.extractCustomerIds(transactions);
@@ -104,7 +104,7 @@ async function syncHistorical() {
   const auth = new SmaregiPlatformAuth({
     clientId: process.env.SMAREGI_CLIENT_ID!,
     clientSecret: process.env.SMAREGI_CLIENT_SECRET!,
-    redirectUri: process.env.SMAREGI_REDIRECT_URI!,
+    contractId: process.env.SMAREGI_CONTRACT_ID!,
     tokenFilePath: process.env.SMAREGI_TOKEN_FILE || "./.smaregi-token.json",
     useSandbox: process.env.SMAREGI_USE_SANDBOX === "true",
   });
